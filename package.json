@@ -1,0 +1,32 @@
+{
+  "author": {
+    "name": "Jager Mesh"
+  },
+  "bugs": {
+    "url": "https://github.com/jagermesh/js-smart-hint/issues"
+  },
+  "deprecated": false,
+  "description": "Smart Hint",
+  "homepage": "https://github.com/jagermesh/js-smart-hint#readme",
+  "keywords": [
+    "hint"
+  ],
+  "license": "MIT",
+  "main": "smart-hint.js",
+  "name": "js-smart-hint",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jagermesh/js-smart-hint.git"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-eslint": "^6.0.0",
+    "eslint": "^8.7.0"
+  },
+  "scripts": {
+    "build": "npm install && gulp build",
+    "update": "npm update && gulp build",
+    "test": "echo \"OK\""
+  },
+  "version": "1.0.0"
+}
