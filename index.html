@@ -10,7 +10,7 @@
     <h1>Smart Hint Demo</h1>
 
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-md-8">
         <div id="scrollable" style="height:200px;overflow:auto;border:1px solid red;">
         <p>The Pythagorean equation, x2 + y2 = z2, has an <a href="javascript:;" class="has-hint" data-hint="The Pythagorean equation, x2 + y2 = z2, has an infinite number of positive integer solutions for x, y, and z; these solutions are known as Pythagorean triples">infinite number</a> of positive integer solutions for x, y, and z; these solutions are known as Pythagorean triples. Around 1637, Fermat wrote in the margin of a book that the more general equation an + bn = cn had no solutions in positive integers, if n is an integer greater than 2. Although he claimed to have a general proof of his conjecture, Fermat left no details of his proof, and no proof by him has ever been found. His claim was discovered some 30 years later, after his death. This claim, which came to be known as Fermat's Last Theorem, stood unsolved in mathematics for the following three and a half centuries.
 The <a href="javascript:;" class="has-custom-hint">claim eventually</a> became one of the most notable unsolved problems of mathematics. Attempts to prove it prompted substantial development in number theory, and over time Fermat's Last Theorem gained prominence as an unsolved problem in mathematics.</p>
@@ -24,7 +24,6 @@ The <a href="javascript:;" class="has-custom-hint">claim eventually</a> became o
 The <a href="javascript:;" class="has-custom-hint">claim eventually</a> became one of the most notable unsolved problems of mathematics. Attempts to prove it prompted substantial development in number theory, and over time Fermat's Last Theorem gained prominence as an unsolved problem in mathematics.</p>
         </div>
 
-
         <div class="scrollable" style="height:200px;overflow:auto;border:1px solid red;">
         <p>The Pythagorean equation, x2 + y2 = z2, has an <a href="javascript:;" class="has-hint" data-hint="The Pythagorean equation, x2 + y2 = z2, has an infinite number of positive integer solutions for x, y, and z; these solutions are known as Pythagorean triples">infinite number</a> of positive integer solutions for x, y, and z; these solutions are known as Pythagorean triples. Around 1637, Fermat wrote in the margin of a book that the more general equation an + bn = cn had no solutions in positive integers, if n is an integer greater than 2. Although he claimed to have a general proof of his conjecture, Fermat left no details of his proof, and no proof by him has ever been found. His claim was discovered some 30 years later, after his death. This claim, which came to be known as Fermat's Last Theorem, stood unsolved in mathematics for the following three and a half centuries.
 The <a href="javascript:;" class="has-custom-hint">claim eventually</a> became one of the most notable unsolved problems of mathematics. Attempts to prove it prompted substantial development in number theory, and over time Fermat's Last Theorem gained prominence as an unsolved problem in mathematics.</p>
@@ -37,6 +36,37 @@ The <a href="javascript:;" class="has-custom-hint">claim eventually</a> became o
 
 The <a href="javascript:;" class="has-custom-hint">claim eventually</a> became one of the most notable unsolved problems of mathematics. Attempts to prove it prompted substantial development in number theory, and over time Fermat's Last Theorem gained prominence as an unsolved problem in mathematics.</p>
         </div>
+      </div>
+      <div class="col-md-4">
+<pre style="border:1px solid #666;right:10px;border-radius: 4px;font-size: 9pt;background-color: black;color:white;">
+&lt;script src="smart-hint.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  /* global SmartHint */
+  const hint = new SmartHint();
+
+  // from data-hint tag
+  hint.attach('.has-hint');
+
+  // ganerate dynamically
+  hint.attach('.has-custom-hint', {
+    getContent: function(selector) {
+      return new Promise(function(resolve) {
+        resolve(Math.random(0, 100000));
+      });
+    },
+    beautify: function(hintOverlay, selector) {
+      hintOverlay.style.fontSize = `${Math.floor(Math.random() * 10)+8}pt`;
+      hintOverlay.style.backgroundColor = 'red';
+      hintOverlay.style.color = 'white';
+    }
+  });
+&lt;/script&gt;
+</pre>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
 
         <p>The Pythagorean equation, x2 + y2 = z2, has an <a href="javascript:;" class="has-hint" data-hint="The Pythagorean equation, x2 + y2 = z2, has an infinite number of positive integer solutions for x, y, and z; these solutions are known as Pythagorean triples">infinite number</a> of positive integer solutions for x, y, and z; these solutions are known as Pythagorean triples. Around 1637, Fermat wrote in the margin of a book that the more general equation an + bn = cn had no solutions in positive integers, if n is an integer greater than 2. Although he claimed to have a general proof of his conjecture, Fermat left no details of his proof, and no proof by him has ever been found. His claim was discovered some 30 years later, after his death. This claim, which came to be known as Fermat's Last Theorem, stood unsolved in mathematics for the following three and a half centuries.
 
@@ -92,16 +122,6 @@ The <a href="javascript:;" class="has-custom-hint">claim eventually</a> became o
   <script src="smart-hint.js"></script>
   <script>
     /* global SmartHint */
-    function randomText(length) {
-      let result = '';
-      let characters = 'ABCDEFGHIJKLMNO PQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let charactersLength = characters.length;
-      for (let i = 0; i < length; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      }
-      return result;
-    }
-
     const hint = new SmartHint();
 
     // from data-hint tag
@@ -111,7 +131,7 @@ The <a href="javascript:;" class="has-custom-hint">claim eventually</a> became o
     hint.attach('.has-custom-hint', {
       getContent: function(selector) {
         return new Promise(function(resolve) {
-          resolve(randomText(100));
+          resolve(Math.random(0, 100000));
         });
       },
       beautify: function(hintOverlay, selector) {

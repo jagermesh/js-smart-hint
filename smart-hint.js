@@ -131,10 +131,12 @@ function SmartHint() {
     saveMousePos(event);
 
     params.getContent(selector).then(function(content) {
-      hintOverlay.innerHTML = content;
-      reposition();
-      hintOverlay.classList.add(`${hintClass}-show`);
-      hintOverlay.classList.remove(`${hintClass}-hide`);
+      if (content) {
+        hintOverlay.innerHTML = content;
+        reposition();
+        hintOverlay.classList.add(`${hintClass}-show`);
+        hintOverlay.classList.remove(`${hintClass}-hide`);
+      }
     })
 
     return _this;
