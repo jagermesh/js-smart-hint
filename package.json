@@ -30,5 +30,5 @@
     "update": "npm update && gulp build",
     "test": "echo \"OK\""
   },
-  "version": "1.0.3"
+  "version": "1.0.4"
 }
