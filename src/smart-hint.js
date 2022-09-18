@@ -22,6 +22,9 @@
         padding: 5px 10px 5px 10px;
         font-size:10pt;
         word-break: break-word;
+        overflow: hidden;
+        margin: 10px;
+        box-sizing: border-box;
 
         border: 1px solid #999;
         border: 1px solid rgba(0,0,0,.2);
@@ -58,10 +61,9 @@
     function checkForHintRenderer(nodeList) {
       for (let i = 0; i < nodeList.length; i++) {
         let item = nodeList[i];
-        if (item.getAttribute && item.getAttribute(`${componentClass}-attached`)) {
-          destroyHintRenderer(item);
-          break;
-        } else
+        if (item.smartHintRenderer) {
+          left(item);
+        }
         if (item.childNodes) {
           checkForHintRenderer(item.childNodes);
         }
@@ -84,6 +86,8 @@
     function Renderer(selector, event, params) {
       const _this = this;
 
+      _this.element = selector;
+
       let currentTop, currentLeft;
 
       function saveMousePos(event) {
@@ -94,38 +98,77 @@
       }
 
       function reposition() {
-        const documentHeight = parseFloat(getComputedStyle(document.body, null).height.replace('px', ''));
-        const documentWidth = parseFloat(getComputedStyle(document.body, null).width.replace('px', ''));
+        const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
+
+        const halfOfWindowHeight = Math.round(windowHeight / 2);
+
+        hintOverlay.style.left = `0`;
+        hintOverlay.style.top = `0`;
+        hintOverlay.style.height = null;
+        hintOverlay.style.width = null;
+
         const contentHeight = hintOverlay.offsetHeight;
         const contentWidth = hintOverlay.offsetWidth;
-        let deltaTop = 0;
-        let deltaLeft = 0;
-        if (currentLeft + contentWidth > documentWidth) {
-          deltaLeft = contentWidth;
+        console.log(contentWidth);
+
+        let newPosition = { };
+        console.log((currentTop + contentHeight) - windowHeight );
+        if ((currentTop < halfOfWindowHeight) || ((currentTop + contentHeight) - windowHeight < -20)) {
+          newPosition.top = currentTop;
+          if (windowHeight - (currentTop + contentHeight) < 10) {
+            newPosition.height = windowHeight - currentTop - 20;
+          }
+        } else {
+          newPosition.top = currentTop - contentHeight - 20;
+          if (newPosition.top < 0) {
+            newPosition.top = 0;
+            newPosition.height = currentTop - 20;
+          }
         }
-        if (currentTop + contentHeight > documentHeight) {
-          deltaTop = contentHeight;
+
+        newPosition.left = currentLeft;
+        if (windowWidth - (currentLeft + contentWidth) < 20) {
+          console.log('A');
+          newPosition.left = (windowWidth - contentWidth) - 20;
         }
-        let newPosition = {
-          left: currentLeft - deltaLeft + (deltaLeft > 0 ? -10 : 10),
-          top: currentTop - deltaTop + (deltaTop > 0 ? -10 : 10)
-        };
-        const windowHeight = window.innerHeight;
-        const windowScrollTop = window.scrollY;
-        let relativeTop = newPosition.top - windowScrollTop;
-        if (relativeTop + contentHeight > windowHeight) {
-          newPosition.top = newPosition.top - ((relativeTop + contentHeight) - windowHeight) - 10;
-        } else
-        if (newPosition.top < windowScrollTop) {
-          newPosition.top = windowScrollTop + 10;
+
+        if (newPosition.left < 0) {
+          newPosition.left = 0;
         }
+        if (newPosition.left + contentWidth > windowWidth) {
+          newPosition.width = windowWidth;
+        }
+
         hintOverlay.style.left = `${newPosition.left}px`;
         hintOverlay.style.top = `${newPosition.top}px`;
+        if (newPosition.width) {
+          hintOverlay.style.width = `${newPosition.width}px`;
+        } else {
+          hintOverlay.style.width = null;
+        }
+        if (newPosition.height) {
+          hintOverlay.style.height = `${newPosition.height}px`;
+        } else {
+          hintOverlay.style.height = null;
+        }
       }
 
       _this.move = function(event) {
         saveMousePos(event);
         reposition();
+      };
+
+      _this.hide = function() {
+        hintOverlay.classList.remove(`${componentClass}-show`);
+        hintOverlay.classList.add(`${componentClass}-hide`);
+      };
+
+      _this.show = function() {
+        if (hintOverlay.innerHTML) {
+          hintOverlay.classList.add(`${componentClass}-show`);
+          hintOverlay.classList.remove(`${componentClass}-hide`);
+        }
       };
 
       _this.destroy = function() {
@@ -156,31 +199,33 @@
       return _this;
     }
 
-    function createHintRenderer(element, event, params) {
+    function entered(element, event, params) {
       if (!element.classList.contains(componentClass)) {
         element.classList.add(componentClass);
       }
-      if (activeRenderer) {
-        activeRenderer.destroy();
-        activeRenderer = null;
-      }
-      activeRenderer = new Renderer(element, event, params);
-      element.setAttribute(`${componentClass}-attached`, true);
+      moved(element, event, params);
     }
 
-    function syncHintRenderer(event) {
-      if (activeRenderer) {
-        activeRenderer.move(event);
+    function moved(element, event, params) {
+      if (activeRenderer && (activeRenderer != element.smartHintRenderer)) {
+        activeRenderer.hide();
       }
+      if (element.smartHintRenderer) {
+        element.smartHintRenderer.show();
+      } else {
+        element.smartHintRenderer = new Renderer(element, event, params);
+      }
+      activeRenderer = element.smartHintRenderer;
+      activeRenderer.move(event);
     }
 
-    function destroyHintRenderer(element) {
-      if (activeRenderer) {
-        activeRenderer.destroy();
-        activeRenderer = null;
-      }
-      if (element) {
-        element.removeAttribute(`${componentClass}-attached`);
+    function left(element) {
+      if (element.smartHintRenderer) {
+        if (element.smartHintRenderer == activeRenderer) {
+          activeRenderer = null;
+        }
+        element.smartHintRenderer.destroy();
+        element.smartHintRenderer = null;
       }
     }
 
@@ -210,15 +255,17 @@
       }, settings);
 
       delegate('mouseenter', selector, function(event) {
-        createHintRenderer(this, event, params)
+        // console.log('BB');
+        entered(this, event, params)
       });
 
       delegate('mousemove', selector, function(event) {
-        syncHintRenderer(event);
+        // console.log('AA');
+        moved(this, event, params);
       });
 
       delegate('mouseleave', selector, function() {
-        destroyHintRenderer(this);
+        left(this);
       });
     };
 
