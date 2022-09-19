@@ -110,10 +110,8 @@
 
         const contentHeight = hintOverlay.offsetHeight;
         const contentWidth = hintOverlay.offsetWidth;
-        console.log(contentWidth);
 
         let newPosition = { };
-        console.log((currentTop + contentHeight) - windowHeight );
         if ((currentTop < halfOfWindowHeight) || ((currentTop + contentHeight) - windowHeight < -20)) {
           newPosition.top = currentTop;
           if (windowHeight - (currentTop + contentHeight) < 10) {
@@ -129,7 +127,6 @@
 
         newPosition.left = currentLeft;
         if (windowWidth - (currentLeft + contentWidth) < 20) {
-          console.log('A');
           newPosition.left = (windowWidth - contentWidth) - 20;
         }
 
@@ -255,12 +252,10 @@
       }, settings);
 
       delegate('mouseenter', selector, function(event) {
-        // console.log('BB');
         entered(this, event, params)
       });
 
       delegate('mousemove', selector, function(event) {
-        // console.log('AA');
         moved(this, event, params);
       });
 
