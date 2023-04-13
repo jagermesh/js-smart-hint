@@ -21,7 +21,7 @@
         max-width:400px;
         padding: 5px 10px 5px 10px;
         font-size:10pt;
-        word-break: break-word;
+        /*word-break: break-word;*/
         overflow: hidden;
         margin: 10px;
         box-sizing: border-box;
