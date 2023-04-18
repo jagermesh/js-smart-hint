@@ -91,8 +91,8 @@
       let currentTop, currentLeft;
 
       function saveMousePos(event) {
-        const pageX = event.pageX || event.touches[0]?.pageX;
-        const pageY = event.pageY || event.touches[0]?.pageY;
+        const pageX = event.pageX ?? event.touches[0].pageX;
+        const pageY = event.pageY ?? event.touches[0].pageY;
         currentLeft = pageX;
         currentTop = pageY;
       }
