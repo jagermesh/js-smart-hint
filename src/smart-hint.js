@@ -103,8 +103,8 @@
         hintOverlay.style.left = `0`;
         hintOverlay.style.top = `0`;
 
-        const contentHeight = hintOverlay.offsetHeight;
-        const contentWidth = hintOverlay.offsetWidth;
+        const contentHeight = hintOverlay.getBoundingClientRect().height;
+        const contentWidth = hintOverlay.getBoundingClientRect().width;
 
         let newPosition = { };
         if (currentClientTop - contentHeight - 20 < 0) {
@@ -154,7 +154,6 @@
       let hintOverlay = document.createElement('div');
       hintOverlay.classList.add(`${componentClass}-container`);
       hintOverlay.classList.add(`${componentClass}-hide`);
-      // hintOverlay.style.visibility = 'hidden';
       hintOverlay.style.color = params.fgColor;
       hintOverlay.style.backgroundColor = params.bgColor;
 
@@ -166,11 +165,7 @@
 
       params.getContent(selector).then(function(content) {
         if (content) {
-          hintOverlay.style.left = `0`;
-          hintOverlay.style.top = `0`;
-          hintOverlay.style.width = '';
           hintOverlay.innerHTML = content;
-          hintOverlay.style.width = `${hintOverlay.offsetWidth + 10}px`;
           reposition();
           hintOverlay.classList.add(`${componentClass}-show`);
           hintOverlay.classList.remove(`${componentClass}-hide`);
