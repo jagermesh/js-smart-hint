@@ -18,13 +18,12 @@
         background-color:black;
         color:white;
         z-index:10000;
-        max-width:400px;
         padding: 5px 10px 5px 10px;
         font-size:10pt;
-        /*word-break: break-word;*/
         overflow: hidden;
         margin: 10px;
         box-sizing: border-box;
+        max-width: 400px;
 
         border: 1px solid #999;
         border: 1px solid rgba(0,0,0,.2);
@@ -88,66 +87,46 @@
 
       _this.element = selector;
 
-      let currentTop, currentLeft;
+      let currentTop;
+      let currentLeft;
+      let currentClientTop;
 
       function saveMousePos(event) {
-        const pageX = event.pageX;
-        const pageY = event.pageY;
-        currentLeft = pageX;
-        currentTop = pageY;
+        currentLeft = event.pageX;
+        currentTop = event.pageY;
+        currentClientTop = event.clientY;
       }
 
-      function reposition() {
-        const windowHeight = window.innerHeight;
+      function reposition(secondary) {
         const windowWidth = window.innerWidth;
-
-        const halfOfWindowHeight = Math.round(windowHeight / 2);
 
         hintOverlay.style.left = `0`;
         hintOverlay.style.top = `0`;
-        hintOverlay.style.height = null;
-        hintOverlay.style.width = null;
 
         const contentHeight = hintOverlay.offsetHeight;
         const contentWidth = hintOverlay.offsetWidth;
 
         let newPosition = { };
-        if ((currentTop < halfOfWindowHeight) || ((currentTop + contentHeight) - windowHeight < -20)) {
+        if (currentClientTop - contentHeight - 20 < 0) {
           newPosition.top = currentTop;
-          if (windowHeight - (currentTop + contentHeight) < 10) {
-            newPosition.height = windowHeight - currentTop - 20;
-          }
         } else {
           newPosition.top = currentTop - contentHeight - 20;
-          if (newPosition.top < 0) {
-            newPosition.top = 0;
-            newPosition.height = currentTop - 20;
-          }
         }
 
         newPosition.left = currentLeft;
-        if (windowWidth - (currentLeft + contentWidth) < 20) {
+        if (currentLeft + contentWidth + 20 > windowWidth) {
           newPosition.left = (windowWidth - contentWidth) - 20;
         }
 
         if (newPosition.left < 0) {
           newPosition.left = 0;
         }
-        if (newPosition.left + contentWidth > windowWidth) {
-          newPosition.width = windowWidth;
-        }
 
         hintOverlay.style.left = `${newPosition.left}px`;
         hintOverlay.style.top = `${newPosition.top}px`;
-        if (newPosition.width) {
-          hintOverlay.style.width = `${newPosition.width}px`;
-        } else {
-          hintOverlay.style.width = null;
-        }
-        if (newPosition.height) {
-          hintOverlay.style.height = `${newPosition.height}px`;
-        } else {
-          hintOverlay.style.height = null;
+
+        if (!secondary) {
+          reposition(true);
         }
       }
 
@@ -175,6 +154,7 @@
       let hintOverlay = document.createElement('div');
       hintOverlay.classList.add(`${componentClass}-container`);
       hintOverlay.classList.add(`${componentClass}-hide`);
+      // hintOverlay.style.visibility = 'hidden';
       hintOverlay.style.color = params.fgColor;
       hintOverlay.style.backgroundColor = params.bgColor;
 
@@ -186,7 +166,11 @@
 
       params.getContent(selector).then(function(content) {
         if (content) {
+          hintOverlay.style.left = `0`;
+          hintOverlay.style.top = `0`;
+          hintOverlay.style.width = '';
           hintOverlay.innerHTML = content;
+          hintOverlay.style.width = `${hintOverlay.offsetWidth + 10}px`;
           reposition();
           hintOverlay.classList.add(`${componentClass}-show`);
           hintOverlay.classList.remove(`${componentClass}-hide`);
