@@ -14,17 +14,16 @@
       stylesContainer.className = styleClass;
       stylesContainer.textContent = `
       .${componentClass}-container {
-        position:absolute;
-        background-color:black;
-        color:white;
-        z-index:10000;
+        position: absolute;
+        background-color: black;
+        color: white;
+        z-index: 10000;
         padding: 5px 10px 5px 10px;
-        font-size:10pt;
+        font-size: 10pt;
         overflow: hidden;
         margin: 10px;
         box-sizing: border-box;
         max-width: 400px;
-
         border: 1px solid #999;
         border: 1px solid rgba(0,0,0,.2);
         -webkit-border-radius: 6px;
@@ -97,12 +96,11 @@
         currentClientTop = event.clientY;
       }
 
-      function reposition(secondary) {
+      function reposition() {
+        hintOverlay.style.left = '0px';
+        hintOverlay.style.top = '0px';
+
         const windowWidth = window.innerWidth;
-
-        hintOverlay.style.left = `0`;
-        hintOverlay.style.top = `0`;
-
         const contentHeight = hintOverlay.getBoundingClientRect().height;
         const contentWidth = hintOverlay.getBoundingClientRect().width;
 
@@ -124,10 +122,6 @@
 
         hintOverlay.style.left = `${newPosition.left}px`;
         hintOverlay.style.top = `${newPosition.top}px`;
-
-        if (!secondary) {
-          reposition(true);
-        }
       }
 
       _this.move = function(event) {
@@ -154,6 +148,8 @@
       let hintOverlay = document.createElement('div');
       hintOverlay.classList.add(`${componentClass}-container`);
       hintOverlay.classList.add(`${componentClass}-hide`);
+      hintOverlay.style.left = '0px';
+      hintOverlay.style.top = '0px';
       hintOverlay.style.color = params.fgColor;
       hintOverlay.style.backgroundColor = params.bgColor;
 
@@ -166,7 +162,6 @@
       params.getContent(selector).then(function(content) {
         if (content) {
           hintOverlay.innerHTML = content;
-          reposition();
           hintOverlay.classList.add(`${componentClass}-show`);
           hintOverlay.classList.remove(`${componentClass}-hide`);
         }
