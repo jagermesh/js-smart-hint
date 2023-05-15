@@ -136,6 +136,7 @@
 
       _this.show = function() {
         if (hintOverlay.innerHTML) {
+          reposition();
           hintOverlay.classList.add(`${componentClass}-show`);
           hintOverlay.classList.remove(`${componentClass}-hide`);
         }
@@ -162,6 +163,7 @@
       params.getContent(selector).then(function(content) {
         if (content) {
           hintOverlay.innerHTML = content;
+          reposition();
           hintOverlay.classList.add(`${componentClass}-show`);
           hintOverlay.classList.remove(`${componentClass}-hide`);
         }
