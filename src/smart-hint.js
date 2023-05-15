@@ -36,6 +36,7 @@
         -webkit-background-clip: padding-box;
         -moz-background-clip: padding-box;
         background-clip: padding-box;
+        opacity: 0.0001;
       }
       .${componentClass}:hover {
         cursor: pointer;
@@ -48,7 +49,7 @@
       .${componentClass}-hide {
         transition: opacity 800ms;
         -webkit-transition: opacity 800ms;
-        opacity: 0;
+        opacity: 0.0001;
       }
     `;
       document.head.append(stylesContainer);
@@ -99,30 +100,29 @@
       function reposition() {
         hintOverlay.style.left = '0px';
         hintOverlay.style.top = '0px';
-        window.setTimeout(() => {
-          const windowWidth = window.innerWidth;
-          const contentHeight = hintOverlay.getBoundingClientRect().height;
-          const contentWidth = hintOverlay.getBoundingClientRect().width;
 
-          let newPosition = { };
-          if (currentClientTop - contentHeight - 20 < 0) {
-            newPosition.top = currentTop;
-          } else {
-            newPosition.top = currentTop - contentHeight - 20;
-          }
+        const windowWidth = window.innerWidth;
+        const contentHeight = hintOverlay.getBoundingClientRect().height;
+        const contentWidth = hintOverlay.getBoundingClientRect().width;
 
-          newPosition.left = currentLeft;
-          if (currentLeft + contentWidth + 20 > windowWidth) {
-            newPosition.left = (windowWidth - contentWidth) - 20;
-          }
+        let newPosition = { };
+        if (currentClientTop - contentHeight - 20 < 0) {
+          newPosition.top = currentTop;
+        } else {
+          newPosition.top = currentTop - contentHeight - 20;
+        }
 
-          if (newPosition.left < 0) {
-            newPosition.left = 0;
-          }
+        newPosition.left = currentLeft;
+        if (currentLeft + contentWidth + 20 > windowWidth) {
+          newPosition.left = (windowWidth - contentWidth) - 20;
+        }
 
-          hintOverlay.style.left = `${newPosition.left}px`;
-          hintOverlay.style.top = `${newPosition.top}px`;
-        });
+        if (newPosition.left < 0) {
+          newPosition.left = 0;
+        }
+
+        hintOverlay.style.left = `${newPosition.left}px`;
+        hintOverlay.style.top = `${newPosition.top}px`;
       }
 
       _this.move = function(event) {
