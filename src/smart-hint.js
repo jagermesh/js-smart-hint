@@ -6,6 +6,10 @@
     const componentClass = 'smart-hint';
     const styleClass = `${componentClass}-styles`;
 
+    const H_EDGE_GAP = 40;
+    const V_EDGE_GAP = 20;
+    const POSITION_GAP = 20;
+
     let stylesContainer = document.head.querySelectorAll(`style.${styleClass}`);
     let activeRenderer;
 
@@ -100,21 +104,15 @@
       function reposition() {
         hintOverlay.style.left = '0px';
         hintOverlay.style.top = '0px';
-
         const windowWidth = window.innerWidth;
-        const contentHeight = hintOverlay.getBoundingClientRect().height;
-        const contentWidth = hintOverlay.getBoundingClientRect().width;
+        const contentHeight = hintOverlay.offsetHeight;
+        const contentWidth = hintOverlay.offsetWidth;
 
         let newPosition = { };
-        if (currentClientTop - contentHeight - 20 < 0) {
-          newPosition.top = currentTop;
-        } else {
-          newPosition.top = currentTop - contentHeight - 20;
-        }
 
         newPosition.left = currentLeft;
-        if (currentLeft + contentWidth + 20 > windowWidth) {
-          newPosition.left = (windowWidth - contentWidth) - 20;
+        if (currentLeft + contentWidth + H_EDGE_GAP > windowWidth) {
+          newPosition.left = currentLeft - contentWidth - POSITION_GAP;
         }
 
         if (newPosition.left < 0) {
@@ -122,6 +120,13 @@
         }
 
         hintOverlay.style.left = `${newPosition.left}px`;
+
+        if (currentClientTop - contentHeight - V_EDGE_GAP < 0) {
+          newPosition.top = currentTop;// + POSITION_GAP;
+        } else {
+          newPosition.top = currentTop - POSITION_GAP - contentHeight;
+        }
+
         hintOverlay.style.top = `${newPosition.top}px`;
       }
 
@@ -164,11 +169,9 @@
       params.getContent(selector).then(function(content) {
         if (content) {
           hintOverlay.innerHTML = content;
-          reposition();
-          hintOverlay.classList.add(`${componentClass}-show`);
-          hintOverlay.classList.remove(`${componentClass}-hide`);
+          _this.show();
         }
-      })
+      });
 
       return _this;
     }
@@ -184,13 +187,15 @@
       if (activeRenderer && (activeRenderer != element.smartHintRenderer)) {
         activeRenderer.hide();
       }
-      if (element.smartHintRenderer) {
-        element.smartHintRenderer.show();
-      } else {
+      const wasNorenderer = !element.smartHintRenderer;
+      if (wasNorenderer) {
         element.smartHintRenderer = new Renderer(element, event, params);
       }
       activeRenderer = element.smartHintRenderer;
-      activeRenderer.move(event);
+
+      if (!wasNorenderer) {
+        activeRenderer.move(event);
+      }
     }
 
     function left(element) {
