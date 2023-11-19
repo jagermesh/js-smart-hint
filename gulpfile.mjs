@@ -1,35 +1,37 @@
-const gulp = require('gulp');
-const eslint = require('gulp-eslint');
-const terser = require('gulp-terser');
-const rename = require('gulp-rename');
+import gulp from 'gulp';
+import eslint from 'gulp-eslint-new';
+import terser from 'gulp-terser';
+import rename from 'gulp-rename';
 
 const configs = {
   eslint: {
     src: [
       '*.js',
-    ]
+    ],
   },
   uglify: {
     dest: 'dist/',
-    src: ['src/smart-hint.js']
-  }
+    src: ['src/smart-hint.js'],
+  },
 };
 
-gulp.task('uglify', function() {
+gulp.task('uglify', () => {
   return gulp.src(configs.uglify.src)
     .pipe(terser({
       compress: false,
-      mangle: false
+      mangle: false,
     }))
     .pipe(rename({
-      suffix: '.min'
+      suffix: '.min',
     }))
     .pipe(gulp.dest(configs.uglify.dest));
 });
 
-gulp.task('eslint', function() {
+gulp.task('eslint', () => {
   return gulp.src(configs.eslint.src)
-    .pipe(eslint({quiet: true}))
+    .pipe(eslint({
+      quiet: true,
+    }))
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 });

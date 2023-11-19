@@ -1,254 +1,255 @@
-(function(window) {
+(() => {
+  class SmartHintRenderer {
+    constructor(selector, event, params) {
+      this.element = selector;
+      this.params = params;
 
-  function SmartHint() {
-    const _this = this;
+      this.H_EDGE_GAP = 40;
+      this.V_EDGE_GAP = 20;
+      this.POSITION_GAP = 20;
 
-    const componentClass = 'smart-hint';
-    const styleClass = `${componentClass}-styles`;
+      this.currentTop = null;
+      this.currentLeft = null;
+      this.currentClientTop = null;
 
-    const H_EDGE_GAP = 40;
-    const V_EDGE_GAP = 20;
-    const POSITION_GAP = 20;
+      this.hintOverlay = document.createElement('div');
+      this.hintOverlay.classList.add(`${this.params.componentClass}-container`);
+      this.hintOverlay.classList.add(`${this.params.componentClass}-hide`);
+      this.hintOverlay.style.left = '0px';
+      this.hintOverlay.style.top = '0px';
+      this.hintOverlay.style.color = params.fgColor;
+      this.hintOverlay.style.backgroundColor = params.bgColor;
 
-    let stylesContainer = document.head.querySelectorAll(`style.${styleClass}`);
-    let activeRenderer;
+      params.beautify(this.hintOverlay, selector);
 
-    if (stylesContainer.length === 0) {
-      stylesContainer = document.createElement('style');
-      stylesContainer.className = styleClass;
-      stylesContainer.textContent = `
-      .${componentClass}-container {
-        position: absolute;
-        background-color: black;
-        color: white;
-        z-index: 10000;
-        padding: 5px 10px 5px 10px;
-        font-size: 10pt;
-        overflow: hidden;
-        margin: 10px;
-        box-sizing: border-box;
-        max-width: 400px;
-        border: 1px solid #999;
-        border: 1px solid rgba(0,0,0,.2);
-        -webkit-border-radius: 6px;
-        -moz-border-radius: 6px;
-        border-radius: 6px;
-        outline: 0;
-        -webkit-box-shadow: 0 3px 7px rgba(0,0,0,.2);
-        -moz-box-shadow: 0 3px 7px rgba(0,0,0,.2);
-        box-shadow: 0 3px 7px rgba(0,0,0,.2);
-        -webkit-background-clip: padding-box;
-        -moz-background-clip: padding-box;
-        background-clip: padding-box;
-        opacity: 0.0001;
-      }
-      .${componentClass}:hover {
-        cursor: pointer;
-      }
-      .${componentClass}-show {
-        transition: opacity 400ms;
-        -webkit-transition: opacity 400ms;
-        opacity: 1;
-      }
-      .${componentClass}-hide {
-        transition: opacity 800ms;
-        -webkit-transition: opacity 800ms;
-        opacity: 0.0001;
-      }
-    `;
-      document.head.append(stylesContainer);
+      document.body.appendChild(this.hintOverlay);
+
+      this.saveMousePos(event);
+
+      params.getContent(selector).then((content) => {
+        if (content) {
+          this.hintOverlay.innerHTML = content;
+          this.show();
+        }
+      });
     }
 
-    const MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+    saveMousePos(event) {
+      this.currentLeft = event.pageX;
+      this.currentTop = event.pageY;
+      this.currentClientTop = event.clientY;
+    }
 
-    function checkForHintRenderer(nodeList) {
+    reposition() {
+      this.hintOverlay.style.left = '0px';
+      this.hintOverlay.style.top = '0px';
+      const windowWidth = window.innerWidth;
+      const contentHeight = this.hintOverlay.offsetHeight;
+      const contentWidth = this.hintOverlay.offsetWidth;
+
+      let newPosition = { };
+
+      newPosition.left = this.currentLeft;
+      if (this.currentLeft + contentWidth + this.H_EDGE_GAP > windowWidth) {
+        newPosition.left = this.currentLeft - contentWidth - this.POSITION_GAP;
+      }
+
+      if (newPosition.left < 0) {
+        newPosition.left = 0;
+      }
+
+      this.hintOverlay.style.left = `${newPosition.left}px`;
+
+      if (this.currentClientTop - contentHeight - this.V_EDGE_GAP < 0) {
+        newPosition.top = this.currentTop;
+      } else {
+        newPosition.top = this.currentTop - this.POSITION_GAP - contentHeight;
+      }
+
+      this.hintOverlay.style.top = `${newPosition.top}px`;
+    }
+
+    move(event) {
+      this.saveMousePos(event);
+      this.reposition();
+    }
+
+    hide() {
+      this.hintOverlay.classList.remove(`${this.params.componentClass}-show`);
+      this.hintOverlay.classList.add(`${this.params.componentClass}-hide`);
+    }
+
+    show() {
+      if (this.hintOverlay.innerHTML) {
+        this.reposition();
+        this.hintOverlay.classList.add(`${this.params.componentClass}-show`);
+        this.hintOverlay.classList.remove(`${this.params.componentClass}-hide`);
+      }
+    }
+
+    destroy() {
+      this.hintOverlay.remove();
+    }
+  }
+
+  class SmartHint {
+    constructor() {
+      this.componentClass = 'smart-hint';
+      const styleClass = `${this.componentClass}-styles`;
+
+      let stylesContainer = document.head.querySelectorAll(`style.${styleClass}`);
+      this.activeRenderer = null;
+
+      if (stylesContainer.length === 0) {
+        stylesContainer = document.createElement('style');
+        stylesContainer.className = styleClass;
+        stylesContainer.textContent = `
+        .${this.componentClass}-container {
+          position: absolute;
+          background-color: black;
+          color: white;
+          z-index: 10000;
+          padding: 5px 10px 5px 10px;
+          font-size: 10pt;
+          overflow: hidden;
+          margin: 10px;
+          box-sizing: border-box;
+          max-width: 400px;
+          border: 1px solid #999;
+          border: 1px solid rgba(0,0,0,.2);
+          -webkit-border-radius: 6px;
+          -moz-border-radius: 6px;
+          border-radius: 6px;
+          outline: 0;
+          -webkit-box-shadow: 0 3px 7px rgba(0,0,0,.2);
+          -moz-box-shadow: 0 3px 7px rgba(0,0,0,.2);
+          box-shadow: 0 3px 7px rgba(0,0,0,.2);
+          -webkit-background-clip: padding-box;
+          -moz-background-clip: padding-box;
+          background-clip: padding-box;
+          opacity: 0.0001;
+        }
+        .${this.componentClass}:hover {
+          cursor: pointer;
+        }
+        .${this.componentClass}-show {
+          transition: opacity 400ms;
+          -webkit-transition: opacity 400ms;
+          opacity: 1;
+        }
+        .${this.componentClass}-hide {
+          transition: opacity 800ms;
+          -webkit-transition: opacity 800ms;
+          opacity: 0.0001;
+        }
+      `;
+        document.head.append(stylesContainer);
+      }
+
+      const MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if ((mutation.type === 'childList') && (mutation.removedNodes.length > 0)) {
+            this.checkForHintRenderer(mutation.removedNodes);
+          }
+        });
+      });
+
+      observer.observe(document.body, {
+        subtree: true,
+        childList: true,
+      });
+
+    }
+
+    checkForHintRenderer(nodeList) {
       for (let i = 0; i < nodeList.length; i++) {
         let item = nodeList[i];
         if (item.smartHintRenderer) {
-          left(item);
+          this.left(item);
         }
         if (item.childNodes) {
-          checkForHintRenderer(item.childNodes);
+          this.checkForHintRenderer(item.childNodes);
         }
       }
     }
 
-    const observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        if ((mutation.type === 'childList') && (mutation.removedNodes.length > 0)) {
-          checkForHintRenderer(mutation.removedNodes);
-        }
-      });
-    });
-
-    observer.observe(document.body, {
-      subtree: true,
-      childList: true
-    });
-
-    function Renderer(selector, event, params) {
-      const _this = this;
-
-      _this.element = selector;
-
-      let currentTop;
-      let currentLeft;
-      let currentClientTop;
-
-      function saveMousePos(event) {
-        currentLeft = event.pageX;
-        currentTop = event.pageY;
-        currentClientTop = event.clientY;
+    entered(element, event, params) {
+      if (!element.classList.contains(this.componentClass)) {
+        element.classList.add(this.componentClass);
       }
-
-      function reposition() {
-        hintOverlay.style.left = '0px';
-        hintOverlay.style.top = '0px';
-        const windowWidth = window.innerWidth;
-        const contentHeight = hintOverlay.offsetHeight;
-        const contentWidth = hintOverlay.offsetWidth;
-
-        let newPosition = { };
-
-        newPosition.left = currentLeft;
-        if (currentLeft + contentWidth + H_EDGE_GAP > windowWidth) {
-          newPosition.left = currentLeft - contentWidth - POSITION_GAP;
-        }
-
-        if (newPosition.left < 0) {
-          newPosition.left = 0;
-        }
-
-        hintOverlay.style.left = `${newPosition.left}px`;
-
-        if (currentClientTop - contentHeight - V_EDGE_GAP < 0) {
-          newPosition.top = currentTop;// + POSITION_GAP;
-        } else {
-          newPosition.top = currentTop - POSITION_GAP - contentHeight;
-        }
-
-        hintOverlay.style.top = `${newPosition.top}px`;
-      }
-
-      _this.move = function(event) {
-        saveMousePos(event);
-        reposition();
-      };
-
-      _this.hide = function() {
-        hintOverlay.classList.remove(`${componentClass}-show`);
-        hintOverlay.classList.add(`${componentClass}-hide`);
-      };
-
-      _this.show = function() {
-        if (hintOverlay.innerHTML) {
-          reposition();
-          hintOverlay.classList.add(`${componentClass}-show`);
-          hintOverlay.classList.remove(`${componentClass}-hide`);
-        }
-      };
-
-      _this.destroy = function() {
-        hintOverlay.remove();
-      };
-
-      let hintOverlay = document.createElement('div');
-      hintOverlay.classList.add(`${componentClass}-container`);
-      hintOverlay.classList.add(`${componentClass}-hide`);
-      hintOverlay.style.left = '0px';
-      hintOverlay.style.top = '0px';
-      hintOverlay.style.color = params.fgColor;
-      hintOverlay.style.backgroundColor = params.bgColor;
-
-      params.beautify(hintOverlay, selector);
-
-      document.body.appendChild(hintOverlay);
-
-      saveMousePos(event);
-
-      params.getContent(selector).then(function(content) {
-        if (content) {
-          hintOverlay.innerHTML = content;
-          _this.show();
-        }
-      });
-
-      return _this;
+      this.moved(element, event, params);
     }
 
-    function entered(element, event, params) {
-      if (!element.classList.contains(componentClass)) {
-        element.classList.add(componentClass);
-      }
-      moved(element, event, params);
-    }
-
-    function moved(element, event, params) {
-      if (activeRenderer && (activeRenderer != element.smartHintRenderer)) {
-        activeRenderer.hide();
+    moved(element, event, params) {
+      if (this.activeRenderer && (this.activeRenderer != element.smartHintRenderer)) {
+        this.activeRenderer.hide();
       }
       const wasNorenderer = !element.smartHintRenderer;
       if (wasNorenderer) {
-        element.smartHintRenderer = new Renderer(element, event, params);
+        element.smartHintRenderer = new SmartHintRenderer(element, event, params);
       }
-      activeRenderer = element.smartHintRenderer;
+      this.activeRenderer = element.smartHintRenderer;
 
       if (!wasNorenderer) {
-        activeRenderer.move(event);
+        this.activeRenderer.move(event);
       }
     }
 
-    function left(element) {
+    left(element) {
       if (element.smartHintRenderer) {
-        if (element.smartHintRenderer == activeRenderer) {
-          activeRenderer = null;
+        if (element.smartHintRenderer == this.activeRenderer) {
+          this.activeRenderer = null;
         }
         element.smartHintRenderer.destroy();
         element.smartHintRenderer = null;
       }
     }
 
-    function delegate(eventName, selector, handler) {
-      document.addEventListener(eventName, function(event) {
+    delegate(eventName, selector, handler) {
+      document.addEventListener(eventName, (event) => {
         for (let target = event.target; target && target != this; target = target.parentNode) {
-          if (target.matches(selector)) {
-            handler.call(target, event);
+          if (target.matches && target.matches(selector)) {
+            handler(target, event);
             break;
           }
         }
       }, true);
     }
 
-    _this.attach = function(selector, settings) {
+    attach(selector, settings) {
       const params = Object.assign({
         bgColor: 'black',
         fgColor: 'white',
-        getContent: function(selector) {
-          return new Promise(function(resolve) {
+        getContent: (selector) => {
+          return new Promise((resolve) => {
             resolve(selector.getAttribute('data-hint'));
           });
         },
-        beautify: function() {
+        beautify: () => {
         //
-        }
+        },
+        componentClass: this.componentClass,
       }, settings);
 
-      delegate('mouseenter', selector, function(event) {
-        entered(this, event, params)
+      this.delegate('mouseenter', selector, (target, event) => {
+        this.entered(target, event, params);
       });
 
-      delegate('mousemove', selector, function(event) {
-        moved(this, event, params);
+      this.delegate('mousemove', selector, (target, event) => {
+        this.moved(target, event, params);
       });
 
-      delegate('mouseleave', selector, function() {
-        left(this);
+      this.delegate('mouseleave', selector, (target) => {
+        this.left(target);
       });
-    };
-
-    return _this;
+    }
   }
 
-  if (typeof module !== 'undefined' && module.exports) module.exports = SmartHint; else window.SmartHint = SmartHint;
-
-})(window);
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = SmartHint;
+  } else {
+    window.SmartHint = SmartHint;
+  }
+})();
