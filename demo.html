@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Hint demo</title>
+<style>
+  body {
+    font-family: sans-serif;
+    margin: 40px;
+    line-height: 1.8;
+  }
+  .has-hint,
+  .has-custom-hint {
+    text-decoration: underline dotted;
+  }
+</style>
+</head>
+<body>
+
+<h1>Smart Hint demo</h1>
+
+<p>
+  Hover over this <span class="has-hint" data-hint="Hello, I am a default hint!">text</span>
+  to see the default, self-repositioning hint.
+</p>
+
+<p>
+  Hover over this <span class="has-custom-hint">text</span>
+  to see a custom hint with its own content and styling.
+</p>
+
+<script src="dist/smart-hint.js"></script>
+<script>
+  const hint = new SmartHint();
+
+  hint.attach('.has-hint');
+
+  hint.attach('.has-custom-hint', {
+    getContent: function(selector) {
+      return new Promise(function(resolve) {
+        resolve('Custom hint text');
+      });
+    },
+    beautify: function(hintOverlay, selector) {
+      hintOverlay.style.fontSize = `${Math.floor(Math.random() * 10) + 8}pt`;
+      hintOverlay.style.backgroundColor = 'red';
+      hintOverlay.style.color = 'white';
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -12,23 +12,28 @@
     "hint"
   ],
   "license": "MIT",
-  "main": "smart-hint.js",
+  "main": "dist/smart-hint.min.js",
+  "module": "src/smart-hint.js",
+  "unpkg": "dist/smart-hint.min.js",
+  "jsdelivr": "dist/smart-hint.min.js",
   "name": "js-smart-hint",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/jagermesh/js-smart-hint.git"
   },
   "devDependencies": {
-    "gulp": "^4.0.2",
-    "gulp-eslint-new": "^1.8.4",
-    "gulp-rename": "^2.0.0",
-    "gulp-terser": "^2.1.0",
-    "eslint": "^8.54.0"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0",
+    "globals": "^17.9.0",
+    "terser": "^5.49.2",
+    "terser-webpack-plugin": "^5.3.14",
+    "webpack": "^5.104.1",
+    "webpack-cli": "^6.0.1"
   },
   "scripts": {
-    "build": "npm install && gulp build",
-    "update": "npm update && gulp build",
-    "test": "echo \"OK\""
+    "build": "npm install && npm audit fix && webpack --config webpack.config.mjs",
+    "update": "npm update && npm audit fix && webpack --config webpack.config.mjs",
+    "lint": "eslint src"
   },
   "version": "1.0.17",
   "engines": {
