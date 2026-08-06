@@ -16,7 +16,7 @@
   "module": "src/smart-hint.js",
   "unpkg": "dist/smart-hint.min.js",
   "jsdelivr": "dist/smart-hint.min.js",
-  "name": "js-smart-hint",
+  "name": "@jagermesh/js-smart-hint",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/jagermesh/js-smart-hint.git"
@@ -33,10 +33,20 @@
   "scripts": {
     "build": "npm install && npm audit fix && webpack --config webpack.config.mjs",
     "update": "npm update && npm audit fix && webpack --config webpack.config.mjs",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "npm run lint"
   },
   "version": "1.0.17",
   "engines": {
     "node": ">=12.0.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ]
 }
