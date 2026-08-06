@@ -1,15 +1,56 @@
+const COMPONENT_CLASS = 'jm-smart-hint';
+const STYLE_CLASS = `${COMPONENT_CLASS}-styles`;
+const H_EDGE_GAP = 40;
+const V_EDGE_GAP = 20;
+const POSITION_GAP = 20;
+
+const STYLE_CSS = `
+  .${COMPONENT_CLASS}-container {
+    position: absolute;
+    background-color: black;
+    color: white;
+    z-index: 10000;
+    padding: 5px 10px 5px 10px;
+    font-size: 10pt;
+    overflow: hidden;
+    margin: 10px;
+    box-sizing: border-box;
+    max-width: 400px;
+    border: 1px solid #999;
+    border: 1px solid rgba(0,0,0,.2);
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    outline: 0;
+    -webkit-box-shadow: 0 3px 7px rgba(0,0,0,.2);
+    -moz-box-shadow: 0 3px 7px rgba(0,0,0,.2);
+    box-shadow: 0 3px 7px rgba(0,0,0,.2);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+    background-clip: padding-box;
+    opacity: 0.0001;
+  }
+  .${COMPONENT_CLASS}:hover {
+    cursor: pointer;
+  }
+  .${COMPONENT_CLASS}-show {
+    transition: opacity 400ms;
+    -webkit-transition: opacity 400ms;
+    opacity: 1;
+  }
+  .${COMPONENT_CLASS}-hide {
+    transition: opacity 800ms;
+    -webkit-transition: opacity 800ms;
+    opacity: 0.0001;
+  }
+`;
+
 /**
  * SmartHintRenderer is purely internal machinery: one instance is created per
  * currently-shown hint to handle its positioning/rendering. It is never
  * exported and consumers never interact with it directly.
  */
 class SmartHintRenderer {
-  #params;
-
-  #H_EDGE_GAP = 40;
-  #V_EDGE_GAP = 20;
-  #POSITION_GAP = 20;
-
   #currentTop = null;
   #currentLeft = null;
   #currentClientTop = null;
@@ -17,11 +58,9 @@ class SmartHintRenderer {
   #hintOverlay;
 
   constructor(selector, event, params) {
-    this.#params = params;
-
     this.#hintOverlay = document.createElement('div');
-    this.#hintOverlay.classList.add(`${this.#params.componentClass}-container`);
-    this.#hintOverlay.classList.add(`${this.#params.componentClass}-hide`);
+    this.#hintOverlay.classList.add(`${COMPONENT_CLASS}-container`);
+    this.#hintOverlay.classList.add(`${COMPONENT_CLASS}-hide`);
     this.#hintOverlay.style.left = '0px';
     this.#hintOverlay.style.top = '0px';
     this.#hintOverlay.style.color = params.fgColor;
@@ -57,8 +96,8 @@ class SmartHintRenderer {
     let newPosition = { };
 
     newPosition.left = this.#currentLeft;
-    if (this.#currentLeft + contentWidth + this.#H_EDGE_GAP > windowWidth) {
-      newPosition.left = this.#currentLeft - contentWidth - this.#POSITION_GAP;
+    if (this.#currentLeft + contentWidth + H_EDGE_GAP > windowWidth) {
+      newPosition.left = this.#currentLeft - contentWidth - POSITION_GAP;
     }
 
     if (newPosition.left < 0) {
@@ -67,10 +106,10 @@ class SmartHintRenderer {
 
     this.#hintOverlay.style.left = `${newPosition.left}px`;
 
-    if (this.#currentClientTop - contentHeight - this.#V_EDGE_GAP < 0) {
+    if (this.#currentClientTop - contentHeight - V_EDGE_GAP < 0) {
       newPosition.top = this.#currentTop;
     } else {
-      newPosition.top = this.#currentTop - this.#POSITION_GAP - contentHeight;
+      newPosition.top = this.#currentTop - POSITION_GAP - contentHeight;
     }
 
     this.#hintOverlay.style.top = `${newPosition.top}px`;
@@ -82,15 +121,15 @@ class SmartHintRenderer {
   }
 
   hide() {
-    this.#hintOverlay.classList.remove(`${this.#params.componentClass}-show`);
-    this.#hintOverlay.classList.add(`${this.#params.componentClass}-hide`);
+    this.#hintOverlay.classList.remove(`${COMPONENT_CLASS}-show`);
+    this.#hintOverlay.classList.add(`${COMPONENT_CLASS}-hide`);
   }
 
   #show() {
     if (this.#hintOverlay.innerHTML) {
       this.#reposition();
-      this.#hintOverlay.classList.add(`${this.#params.componentClass}-show`);
-      this.#hintOverlay.classList.remove(`${this.#params.componentClass}-hide`);
+      this.#hintOverlay.classList.add(`${COMPONENT_CLASS}-show`);
+      this.#hintOverlay.classList.remove(`${COMPONENT_CLASS}-hide`);
     }
   }
 
@@ -104,58 +143,15 @@ class SmartHintRenderer {
  * every group of elements that should show a repositioning hint.
  */
 class SmartHint {
-  #componentClass;
   #activeRenderer = null;
 
   constructor() {
-    this.#componentClass = 'smart-hint';
-    const styleClass = `${this.#componentClass}-styles`;
-
-    let stylesContainer = document.head.querySelectorAll(`style.${styleClass}`);
+    let stylesContainer = document.head.querySelectorAll(`style.${STYLE_CLASS}`);
 
     if (stylesContainer.length === 0) {
       stylesContainer = document.createElement('style');
-      stylesContainer.className = styleClass;
-      stylesContainer.textContent = `
-        .${this.#componentClass}-container {
-          position: absolute;
-          background-color: black;
-          color: white;
-          z-index: 10000;
-          padding: 5px 10px 5px 10px;
-          font-size: 10pt;
-          overflow: hidden;
-          margin: 10px;
-          box-sizing: border-box;
-          max-width: 400px;
-          border: 1px solid #999;
-          border: 1px solid rgba(0,0,0,.2);
-          -webkit-border-radius: 6px;
-          -moz-border-radius: 6px;
-          border-radius: 6px;
-          outline: 0;
-          -webkit-box-shadow: 0 3px 7px rgba(0,0,0,.2);
-          -moz-box-shadow: 0 3px 7px rgba(0,0,0,.2);
-          box-shadow: 0 3px 7px rgba(0,0,0,.2);
-          -webkit-background-clip: padding-box;
-          -moz-background-clip: padding-box;
-          background-clip: padding-box;
-          opacity: 0.0001;
-        }
-        .${this.#componentClass}:hover {
-          cursor: pointer;
-        }
-        .${this.#componentClass}-show {
-          transition: opacity 400ms;
-          -webkit-transition: opacity 400ms;
-          opacity: 1;
-        }
-        .${this.#componentClass}-hide {
-          transition: opacity 800ms;
-          -webkit-transition: opacity 800ms;
-          opacity: 0.0001;
-        }
-      `;
+      stylesContainer.className = STYLE_CLASS;
+      stylesContainer.textContent = STYLE_CSS;
       document.head.append(stylesContainer);
     }
 
@@ -189,8 +185,8 @@ class SmartHint {
   }
 
   #entered(element, event, params) {
-    if (!element.classList.contains(this.#componentClass)) {
-      element.classList.add(this.#componentClass);
+    if (!element.classList.contains(COMPONENT_CLASS)) {
+      element.classList.add(COMPONENT_CLASS);
     }
     this.#moved(element, event, params);
   }
@@ -243,7 +239,6 @@ class SmartHint {
       beautify: () => {
       //
       },
-      componentClass: this.#componentClass,
     }, settings);
 
     this.#delegate('mouseenter', selector, (target, event) => {
