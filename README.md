@@ -13,17 +13,17 @@ Or just open [`demo.html`](./demo.html) directly in a browser — no build step 
 ### As an ES module (npm / bundler)
 
 ~~~
-npm install js-smart-hint
+npm install @jagermesh/js-smart-hint
 ~~~
 
 ~~~js
-import SmartHint from 'js-smart-hint';
+import SmartHint from '@jagermesh/js-smart-hint';
 ~~~
 
 ### As a plain `<script>` tag
 
 ~~~html
-<script src="https://unpkg.com/js-smart-hint/dist/smart-hint.min.js"></script>
+<script src="https://unpkg.com/@jagermesh/js-smart-hint/dist/smart-hint.min.js"></script>
 ~~~
 
 This creates a global `window.SmartHint` you can use directly, exactly as in the examples below.
