@@ -1,10 +1,10 @@
-# Smart Hint.
+# Smart Hint
 
 Simple, lightweight pure JavaScript component that implement customizable re-positioning hint.
 
 ## Demo
 
-Just open [`demo.html`](./demo.html) directly in a browser — no build step needed.
+Open `demo.html` from this repo directly in your browser (no build step required) to see it in action.
 
 ## Installation
 
@@ -16,15 +16,20 @@ npm install @jagermesh/js-smart-hint
 
 ~~~js
 import SmartHint from '@jagermesh/js-smart-hint';
+
+const hint = new SmartHint();
+hint.attach('.has-hint');
 ~~~
 
 ### As a plain `<script>` tag
 
 ~~~html
 <script src="https://unpkg.com/@jagermesh/js-smart-hint/dist/smart-hint.min.js"></script>
+<script>
+  const hint = new window.SmartHint();
+  hint.attach('.has-hint');
+</script>
 ~~~
-
-This creates a global `window.SmartHint` you can use directly, exactly as in the examples below.
 
 ## Usage:
 
@@ -58,9 +63,3 @@ hint.attach('.has-custom-hint', {
   }
 });
 ~~~
-
-That's all.
-
-Have fun. Send PR if you find any glitches or want to make improvements.
-
-:)
