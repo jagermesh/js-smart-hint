@@ -4,9 +4,7 @@ Simple, lightweight pure JavaScript component that implement customizable re-pos
 
 ## Demo
 
-https://jagermesh.github.io/js-smart-hint/
-
-Or just open [`demo.html`](./demo.html) directly in a browser — no build step needed.
+Just open [`demo.html`](./demo.html) directly in a browser — no build step needed.
 
 ## Installation
 
