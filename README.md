@@ -63,3 +63,31 @@ hint.attach('.has-custom-hint', {
   }
 });
 ~~~
+
+### Hints for canvas and other virtual targets
+
+Elements drawn inside a canvas are not DOM nodes, so they cannot be matched by
+`attach()`. Use the imperative API instead:
+
+~~~js
+hint.show('Move', pointerEvent);
+hint.move(pointerEvent);
+hint.hide();
+~~~
+
+`show()` accepts the same visual settings as `attach()`, plus an optional
+`target` value passed to `beautify`:
+
+~~~js
+hint.show('Delete', pointerEvent, {
+  bgColor: 'black',
+  fgColor: 'white',
+  target: fabricControl,
+  beautify: function(hintOverlay, target) {
+    hintOverlay.dataset.control = target.actionName;
+  }
+});
+~~~
+
+All three imperative methods return the `SmartHint` instance and can be
+chained. `content` may be a string or a promise resolving to a string.

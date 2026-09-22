@@ -145,6 +145,8 @@ class SmartHintRenderer {
 class SmartHint {
   #activeRenderer = null;
 
+  #imperativeRenderer = null;
+
   constructor() {
     let stylesContainer = document.head.querySelectorAll(`style.${STYLE_CLASS}`);
 
@@ -169,7 +171,6 @@ class SmartHint {
       subtree: true,
       childList: true,
     });
-
   }
 
   #checkForHintRenderer(nodeList) {
@@ -252,6 +253,52 @@ class SmartHint {
     this.#delegate('mouseleave', selector, (target) => {
       this.#left(target);
     });
+
+    return this;
+  }
+
+  /**
+   * Show a hint for a virtual target such as a canvas control.
+   * @param {string|Promise<string>} content
+   * @param {{pageX: number, pageY: number, clientY: number}} event
+   * @param {{bgColor?: string, fgColor?: string, target?: *, beautify?: Function}} settings
+   * @returns {SmartHint}
+   */
+  show(content, event, settings) {
+    this.hide();
+
+    const params = Object.assign({
+      bgColor: 'black',
+      fgColor: 'white',
+      target: null,
+      beautify: () => {
+      //
+      },
+    }, settings);
+
+    params.getContent = () => Promise.resolve(content);
+    this.#imperativeRenderer = new SmartHintRenderer(params.target, event, params);
+    return this;
+  }
+
+  /**
+   * Move the currently visible imperative hint.
+   * @param {{pageX: number, pageY: number, clientY: number}} event
+   * @returns {SmartHint}
+   */
+  move(event) {
+    this.#imperativeRenderer?.move(event);
+    return this;
+  }
+
+  /**
+   * Remove the currently visible imperative hint.
+   * @returns {SmartHint}
+   */
+  hide() {
+    this.#imperativeRenderer?.destroy();
+    this.#imperativeRenderer = null;
+    return this;
   }
 }
 
